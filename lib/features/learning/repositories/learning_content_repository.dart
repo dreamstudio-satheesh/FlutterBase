@@ -2327,16 +2327,1347 @@ class WeatherCard extends StatelessWidget {
 
   List<LearningChapter> _getStateManagementChapters() {
     return [
-      // Placeholder chapters - will be implemented in tasks 15-18
+      // Chapter 1: Provider Basics
       const LearningChapter(
         id: 'provider-basics',
         sectionId: 'state-management',
         title: 'Provider Basics',
-        content: 'Coming soon...',
-        order: 1,
-        estimatedReadTime: 15,
+        content: '''
+# Provider: State Management Made Simple 🔄
+
+Provider is the most popular and officially recommended state management solution for Flutter. It's built on top of InheritedWidget and provides a simple, scalable way to manage app state.
+
+## Why Provider?
+
+### ✅ **Benefits**
+- **Simple to learn**: Easy concepts and minimal boilerplate
+- **Officially recommended**: Backed by the Flutter team
+- **Performant**: Efficient widget rebuilds
+- **Testable**: Easy to unit test your business logic
+- **Flexible**: Works with any architectural pattern
+
+### ❌ **When NOT to use Provider**
+- Very simple apps with minimal state
+- Apps requiring complex state logic (consider Bloc/Cubit)
+- Teams preferring immutable state management
+
+## Core Concepts
+
+### 1. **ChangeNotifier**
+The heart of Provider - a class that can notify listeners when it changes.
+
+```dart
+class Counter extends ChangeNotifier {
+  int _count = 0;
+  
+  int get count => _count;
+  
+  void increment() {
+    _count++;
+    notifyListeners(); // Triggers UI rebuild
+  }
+  
+  void decrement() {
+    if (_count > 0) {
+      _count--;
+      notifyListeners();
+    }
+  }
+  
+  void reset() {
+    _count = 0;
+    notifyListeners();
+  }
+}
+```
+
+### 2. **ChangeNotifierProvider**
+Provides the ChangeNotifier to the widget tree.
+
+```dart
+void main() {
+  runApp(
+    ChangeNotifierProvider(
+      create: (context) => Counter(),
+      child: MyApp(),
+    ),
+  );
+}
+```
+
+### 3. **Consumer**
+Listens to changes and rebuilds when the state changes.
+
+```dart
+class CounterDisplay extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Consumer<Counter>(
+      builder: (context, counter, child) {
+        return Column(
+          children: [
+            Text(
+              'Count: \${counter.count}',
+              style: TextStyle(fontSize: 24),
+            ),
+            if (child != null) child, // Static child optimization
+          ],
+        );
+      },
+      child: Text('This widget never rebuilds'),
+    );
+  }
+}
+```
+
+### 4. **Provider.of() vs Consumer vs Selector**
+
+```dart
+// Provider.of() - Access provider anywhere
+final counter = Provider.of<Counter>(context, listen: false);
+
+// Consumer - Rebuild when state changes
+Consumer<Counter>(
+  builder: (context, counter, child) => Text('\${counter.count}'),
+)
+
+// Selector - Rebuild only when specific property changes
+Selector<Counter, int>(
+  selector: (context, counter) => counter.count,
+  builder: (context, count, child) => Text('\$count'),
+)
+```
+
+## Building a Real App with Provider
+
+Let's build a complete shopping cart app to demonstrate Provider in action.
+
+### Step 1: Create Models
+
+```dart
+class Product {
+  final String id;
+  final String name;
+  final double price;
+  final String imageUrl;
+  
+  Product({
+    required this.id,
+    required this.name,
+    required this.price,
+    required this.imageUrl,
+  });
+}
+
+class CartItem {
+  final Product product;
+  int quantity;
+  
+  CartItem({
+    required this.product,
+    this.quantity = 1,
+  });
+  
+  double get totalPrice => product.price * quantity;
+}
+```
+
+### Step 2: Create Providers
+
+```dart
+class ProductsProvider extends ChangeNotifier {
+  final List<Product> _products = [
+    Product(
+      id: '1',
+      name: 'Flutter T-Shirt',
+      price: 25.99,
+      imageUrl: 'assets/tshirt.jpg',
+    ),
+    Product(
+      id: '2',
+      name: 'Dart Mug',
+      price: 12.99,
+      imageUrl: 'assets/mug.jpg',
+    ),
+    // ... more products
+  ];
+  
+  List<Product> get products => List.unmodifiable(_products);
+  
+  Product? findById(String id) {
+    try {
+      return _products.firstWhere((product) => product.id == id);
+    } catch (error) {
+      return null;
+    }
+  }
+}
+
+class CartProvider extends ChangeNotifier {
+  final Map<String, CartItem> _items = {};
+  
+  Map<String, CartItem> get items => {..._items};
+  
+  int get itemCount => _items.length;
+  
+  double get totalAmount {
+    double total = 0.0;
+    _items.forEach((key, cartItem) {
+      total += cartItem.totalPrice;
+    });
+    return total;
+  }
+  
+  void addItem(Product product) {
+    if (_items.containsKey(product.id)) {
+      _items[product.id]!.quantity++;
+    } else {
+      _items[product.id] = CartItem(product: product);
+    }
+    notifyListeners();
+  }
+  
+  void removeItem(String productId) {
+    _items.remove(productId);
+    notifyListeners();
+  }
+  
+  void updateQuantity(String productId, int quantity) {
+    if (_items.containsKey(productId)) {
+      if (quantity <= 0) {
+        _items.remove(productId);
+      } else {
+        _items[productId]!.quantity = quantity;
+      }
+      notifyListeners();
+    }
+  }
+  
+  void clear() {
+    _items.clear();
+    notifyListeners();
+  }
+}
+```
+
+### Step 3: Setup Multiple Providers
+
+```dart
+void main() {
+  runApp(
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => ProductsProvider()),
+        ChangeNotifierProvider(create: (_) => CartProvider()),
+        ChangeNotifierProvider(create: (_) => AuthProvider()),
+      ],
+      child: MyApp(),
+    ),
+  );
+}
+```
+
+### Step 4: Consume in UI
+
+```dart
+class ProductsScreen extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Products'),
+        actions: [
+          Consumer<CartProvider>(
+            builder: (context, cart, child) => Badge(
+              value: cart.itemCount.toString(),
+              child: IconButton(
+                icon: Icon(Icons.shopping_cart),
+                onPressed: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => CartScreen()),
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
-    ];
+      body: Consumer<ProductsProvider>(
+        builder: (context, productsData, child) {
+          return GridView.builder(
+            padding: EdgeInsets.all(16),
+            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 2,
+              crossAxisSpacing: 16,
+              mainAxisSpacing: 16,
+              childAspectRatio: 0.75,
+            ),
+            itemCount: productsData.products.length,
+            itemBuilder: (context, index) {
+              final product = productsData.products[index];
+              return ProductCard(product: product);
+            },
+          );
+        },
+      ),
+    );
+  }
+}
+
+class ProductCard extends StatelessWidget {
+  final Product product;
+  
+  const ProductCard({required this.product});
+  
+  @override
+  Widget build(BuildContext context) {
+    final cart = Provider.of<CartProvider>(context, listen: false);
+    
+    return Card(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Expanded(
+            child: Container(
+              decoration: BoxDecoration(
+                image: DecorationImage(
+                  image: AssetImage(product.imageUrl),
+                  fit: BoxFit.cover,
+                ),
+                borderRadius: BorderRadius.vertical(
+                  top: Radius.circular(8),
+                ),
+              ),
+            ),
+          ),
+          Padding(
+            padding: EdgeInsets.all(8),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  product.name,
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                  ),
+                ),
+                SizedBox(height: 4),
+                Text(
+                  '\\\$\${product.price.toStringAsFixed(2)}',
+                  style: TextStyle(
+                    color: Colors.green,
+                    fontSize: 18,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                SizedBox(height: 8),
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      cart.addItem(product);
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text('Added to cart!'),
+                          duration: Duration(seconds: 1),
+                        ),
+                      );
+                    },
+                    child: Text('Add to Cart'),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+```
+
+## Provider Patterns & Best Practices
+
+### 1. **Proxy Provider Pattern**
+When one provider depends on another.
+
+```dart
+class OrdersProvider extends ChangeNotifier {
+  List<Order> _orders = [];
+  String? _authToken;
+  String? _userId;
+  
+  List<Order> get orders => [..._orders];
+  
+  void update(String? token, String? userId, List<Order> orders) {
+    _authToken = token;
+    _userId = userId;
+    _orders = orders;
+  }
+  
+  Future<void> fetchOrders() async {
+    if (_authToken == null) return;
+    
+    // Fetch orders using auth token
+    final response = await http.get(
+      Uri.parse('https://api.example.com/orders'),
+      headers: {'Authorization': 'Bearer \$_authToken'},
+    );
+    
+    // Process response and update _orders
+    notifyListeners();
+  }
+}
+
+// Setup with ProxyProvider
+MultiProvider(
+  providers: [
+    ChangeNotifierProvider(create: (_) => AuthProvider()),
+    ChangeNotifierProxyProvider<AuthProvider, OrdersProvider>(
+      create: (_) => OrdersProvider(),
+      update: (context, auth, previousOrders) => previousOrders!
+        ..update(auth.token, auth.userId, previousOrders.orders),
+    ),
+  ],
+  child: MyApp(),
+)
+```
+
+### 2. **FutureProvider for Async Data**
+
+```dart
+class DataProvider extends ChangeNotifier {
+  List<String> _data = [];
+  bool _isLoading = false;
+  String? _error;
+  
+  List<String> get data => [..._data];
+  bool get isLoading => _isLoading;
+  String? get error => _error;
+  
+  Future<void> loadData() async {
+    _isLoading = true;
+    _error = null;
+    notifyListeners();
+    
+    try {
+      final response = await http.get(Uri.parse('https://api.example.com/data'));
+      if (response.statusCode == 200) {
+        _data = json.decode(response.body).cast<String>();
+      } else {
+        _error = 'Failed to load data';
+      }
+    } catch (e) {
+      _error = e.toString();
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+}
+
+// Using in UI
+Consumer<DataProvider>(
+  builder: (context, dataProvider, child) {
+    if (dataProvider.isLoading) {
+      return Center(child: CircularProgressIndicator());
+    }
+    
+    if (dataProvider.error != null) {
+      return Center(child: Text('Error: \${dataProvider.error}'));
+    }
+    
+    return ListView.builder(
+      itemCount: dataProvider.data.length,
+      itemBuilder: (context, index) {
+        return ListTile(title: Text(dataProvider.data[index]));
+      },
+    );
+  },
+)
+```
+
+### 3. **Selector for Performance**
+Use Selector to rebuild only when specific properties change.
+
+```dart
+// Bad: Rebuilds entire widget when any cart property changes
+Consumer<CartProvider>(
+  builder: (context, cart, child) {
+    return Text('Total: \\\$\${cart.totalAmount.toStringAsFixed(2)}');
+  },
+)
+
+// Good: Only rebuilds when totalAmount changes
+Selector<CartProvider, double>(
+  selector: (context, cart) => cart.totalAmount,
+  builder: (context, totalAmount, child) {
+    return Text('Total: \\\$\${totalAmount.toStringAsFixed(2)}');
+  },
+)
+```
+
+## Testing Provider
+
+Provider makes testing easy by allowing dependency injection.
+
+```dart
+void main() {
+  group('CartProvider Tests', () {
+    late CartProvider cartProvider;
+    late Product testProduct;
+    
+    setUp(() {
+      cartProvider = CartProvider();
+      testProduct = Product(
+        id: '1',
+        name: 'Test Product',
+        price: 10.0,
+        imageUrl: 'test.jpg',
+      );
+    });
+    
+    test('should add item to cart', () {
+      cartProvider.addItem(testProduct);
+      
+      expect(cartProvider.itemCount, 1);
+      expect(cartProvider.totalAmount, 10.0);
+    });
+    
+    test('should increment quantity when same item added', () {
+      cartProvider.addItem(testProduct);
+      cartProvider.addItem(testProduct);
+      
+      expect(cartProvider.itemCount, 1);
+      expect(cartProvider.items['1']!.quantity, 2);
+      expect(cartProvider.totalAmount, 20.0);
+    });
+    
+    test('should remove item from cart', () {
+      cartProvider.addItem(testProduct);
+      cartProvider.removeItem('1');
+      
+      expect(cartProvider.itemCount, 0);
+      expect(cartProvider.totalAmount, 0.0);
+    });
+  });
+}
+
+// Widget testing with Provider
+void main() {
+  testWidgets('ProductCard should add item to cart when tapped', (tester) async {
+    final cartProvider = CartProvider();
+    final product = Product(
+      id: '1',
+      name: 'Test Product',
+      price: 10.0,
+      imageUrl: 'test.jpg',
+    );
+    
+    await tester.pumpWidget(
+      ChangeNotifierProvider.value(
+        value: cartProvider,
+        child: MaterialApp(
+          home: Scaffold(
+            body: ProductCard(product: product),
+          ),
+        ),
+      ),
+    );
+    
+    await tester.tap(find.text('Add to Cart'));
+    await tester.pump();
+    
+    expect(cartProvider.itemCount, 1);
+    expect(find.text('Added to cart!'), findsOneWidget);
+  });
+}
+```
+
+## Common Patterns & Anti-Patterns
+
+### ✅ **Good Practices**
+
+1. **Keep providers focused**: Each provider should handle one domain
+2. **Use listen: false for actions**: When you don't need rebuilds
+3. **Dispose resources**: Clean up in dispose() method
+4. **Use Selector for performance**: Avoid unnecessary rebuilds
+
+```dart
+class UserProvider extends ChangeNotifier {
+  StreamSubscription? _subscription;
+  
+  void startListening() {
+    _subscription = userStream.listen((user) {
+      // Update user data
+      notifyListeners();
+    });
+  }
+  
+  @override
+  void dispose() {
+    _subscription?.cancel();
+    super.dispose();
+  }
+}
+```
+
+### ❌ **Anti-Patterns**
+
+1. **Don't call notifyListeners() in getters**
+2. **Don't access providers in initState() without listen: false**
+3. **Don't create providers in build() method**
+4. **Avoid deep widget trees with many Consumers**
+
+## Migration Tips
+
+### From setState to Provider
+
+```dart
+// Before: StatefulWidget with setState
+class CounterPage extends StatefulWidget {
+  @override
+  _CounterPageState createState() => _CounterPageState();
+}
+
+class _CounterPageState extends State<CounterPage> {
+  int _counter = 0;
+  
+  void _increment() {
+    setState(() {
+      _counter++;
+    });
+  }
+  
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Center(
+        child: Text('\$_counter'),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: _increment,
+        child: Icon(Icons.add),
+      ),
+    );
+  }
+}
+
+// After: Provider with ChangeNotifier
+class CounterPage extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Center(
+        child: Consumer<Counter>(
+          builder: (context, counter, child) => Text('\${counter.count}'),
+        ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () => Provider.of<Counter>(context, listen: false).increment(),
+        child: Icon(Icons.add),
+      ),
+    );
+  }
+}
+```
+
+## Next Steps
+
+After mastering Provider basics:
+
+1. ✅ **Learn advanced Provider patterns** (ProxyProvider, StreamProvider)
+2. ✅ **Combine with Repository pattern** for clean architecture
+3. ✅ **Explore Riverpod** - The next evolution of Provider
+4. ✅ **Consider Bloc/Cubit** for complex state logic
+
+> 💡 **Pro Tip**: Start simple with ChangeNotifierProvider, then graduate to more advanced patterns as your app grows in complexity!
+        ''',
+        order: 1,
+        estimatedReadTime: 25,
+        prerequisites: [
+          'Understanding of StatefulWidget and setState',
+          'Basic knowledge of Flutter widget tree',
+          'Familiarity with Dart classes and inheritance',
+          'Understanding of Observer pattern (helpful)',
+        ],
+        learningObjectives: [
+          'Understand Provider as a state management solution',
+          'Learn ChangeNotifier and ChangeNotifierProvider patterns',
+          'Master Consumer, Provider.of(), and Selector widgets',
+          'Build real-world apps using Provider architecture',
+          'Implement multiple providers with MultiProvider',
+          'Write testable code with Provider dependency injection',
+          'Apply Provider best practices and avoid common pitfalls',
+        ],
+        codeExamples: [
+          CodeExample(
+            id: 'counter-provider',
+            title: 'Basic Counter with Provider',
+            explanation: 'A simple counter app demonstrating ChangeNotifier, ChangeNotifierProvider, and Consumer usage.',
+            code: '''
+// Counter Model
+class Counter extends ChangeNotifier {
+  int _count = 0;
+  
+  int get count => _count;
+  
+  void increment() {
+    _count++;
+    notifyListeners();
+  }
+  
+  void decrement() {
+    if (_count > 0) {
+      _count--;
+      notifyListeners();
+    }
+  }
+  
+  void reset() {
+    _count = 0;
+    notifyListeners();
+  }
+}
+
+// Main App Setup
+void main() {
+  runApp(
+    ChangeNotifierProvider(
+      create: (context) => Counter(),
+      child: MyApp(),
+    ),
+  );
+}
+
+class MyApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Provider Counter',
+      home: CounterScreen(),
+    );
+  }
+}
+
+// Counter Screen
+class CounterScreen extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Provider Counter'),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.refresh),
+            onPressed: () {
+              Provider.of<Counter>(context, listen: false).reset();
+            },
+          ),
+        ],
+      ),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              'Current Count:',
+              style: TextStyle(fontSize: 20),
+            ),
+            SizedBox(height: 20),
+            Consumer<Counter>(
+              builder: (context, counter, child) {
+                return Container(
+                  padding: EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    color: Colors.blue.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(15),
+                  ),
+                  child: Text(
+                    '\${counter.count}',
+                    style: TextStyle(
+                      fontSize: 48,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.blue,
+                    ),
+                  ),
+                );
+              },
+            ),
+            SizedBox(height: 40),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                FloatingActionButton(
+                  onPressed: () {
+                    Provider.of<Counter>(context, listen: false).decrement();
+                  },
+                  heroTag: 'decrement',
+                  backgroundColor: Colors.red,
+                  child: Icon(Icons.remove),
+                ),
+                FloatingActionButton(
+                  onPressed: () {
+                    Provider.of<Counter>(context, listen: false).increment();
+                  },
+                  heroTag: 'increment',
+                  backgroundColor: Colors.green,
+                  child: Icon(Icons.add),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}''',
+            isRunnable: true,
+          ),
+          CodeExample(
+            id: 'shopping-cart-provider',
+            title: 'Shopping Cart with Multiple Providers',
+            explanation: 'A complete shopping cart implementation using multiple providers to demonstrate real-world Provider patterns.',
+            code: '''
+// Product Model
+class Product {
+  final String id;
+  final String name;
+  final double price;
+  final String imageUrl;
+  
+  Product({
+    required this.id,
+    required this.name,
+    required this.price,
+    required this.imageUrl,
+  });
+}
+
+// Cart Item Model
+class CartItem {
+  final Product product;
+  int quantity;
+  
+  CartItem({
+    required this.product,
+    this.quantity = 1,
+  });
+  
+  double get totalPrice => product.price * quantity;
+}
+
+// Products Provider
+class ProductsProvider extends ChangeNotifier {
+  final List<Product> _products = [
+    Product(
+      id: '1',
+      name: 'Flutter T-Shirt',
+      price: 25.99,
+      imageUrl: 'assets/tshirt.jpg',
+    ),
+    Product(
+      id: '2',
+      name: 'Dart Coffee Mug',
+      price: 12.99,
+      imageUrl: 'assets/mug.jpg',
+    ),
+    Product(
+      id: '3',
+      name: 'Mobile Dev Book',
+      price: 39.99,
+      imageUrl: 'assets/book.jpg',
+    ),
+  ];
+  
+  List<Product> get products => List.unmodifiable(_products);
+  
+  Product? findById(String id) {
+    try {
+      return _products.firstWhere((product) => product.id == id);
+    } catch (error) {
+      return null;
+    }
+  }
+}
+
+// Cart Provider
+class CartProvider extends ChangeNotifier {
+  final Map<String, CartItem> _items = {};
+  
+  Map<String, CartItem> get items => {..._items};
+  
+  int get itemCount => _items.length;
+  
+  int get totalQuantity {
+    return _items.values.fold(0, (sum, item) => sum + item.quantity);
+  }
+  
+  double get totalAmount {
+    return _items.values.fold(0.0, (sum, item) => sum + item.totalPrice);
+  }
+  
+  void addItem(Product product) {
+    if (_items.containsKey(product.id)) {
+      _items[product.id]!.quantity++;
+    } else {
+      _items[product.id] = CartItem(product: product);
+    }
+    notifyListeners();
+  }
+  
+  void removeItem(String productId) {
+    _items.remove(productId);
+    notifyListeners();
+  }
+  
+  void updateQuantity(String productId, int quantity) {
+    if (_items.containsKey(productId)) {
+      if (quantity <= 0) {
+        _items.remove(productId);
+      } else {
+        _items[productId]!.quantity = quantity;
+      }
+      notifyListeners();
+    }
+  }
+  
+  void clear() {
+    _items.clear();
+    notifyListeners();
+  }
+}
+
+// Main App
+void main() {
+  runApp(
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => ProductsProvider()),
+        ChangeNotifierProvider(create: (_) => CartProvider()),
+      ],
+      child: MyApp(),
+    ),
+  );
+}
+
+class MyApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Shopping Cart Demo',
+      theme: ThemeData(primarySwatch: Colors.blue),
+      home: ProductsScreen(),
+    );
+  }
+}
+
+// Products Screen
+class ProductsScreen extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Products'),
+        actions: [
+          Consumer<CartProvider>(
+            builder: (context, cart, child) => Stack(
+              alignment: Alignment.center,
+              children: [
+                IconButton(
+                  icon: Icon(Icons.shopping_cart),
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (_) => CartScreen()),
+                    );
+                  },
+                ),
+                if (cart.totalQuantity > 0)
+                  Positioned(
+                    right: 8,
+                    top: 8,
+                    child: Container(
+                      padding: EdgeInsets.all(2),
+                      decoration: BoxDecoration(
+                        color: Colors.red,
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      constraints: BoxConstraints(
+                        minWidth: 16,
+                        minHeight: 16,
+                      ),
+                      child: Text(
+                        '\${cart.totalQuantity}',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 12,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                  ),
+              ],
+            ),
+          ),
+        ],
+      ),
+      body: Consumer<ProductsProvider>(
+        builder: (context, productsData, child) {
+          return GridView.builder(
+            padding: EdgeInsets.all(16),
+            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 2,
+              crossAxisSpacing: 16,
+              mainAxisSpacing: 16,
+              childAspectRatio: 0.7,
+            ),
+            itemCount: productsData.products.length,
+            itemBuilder: (context, index) {
+              final product = productsData.products[index];
+              return ProductCard(product: product);
+            },
+          );
+        },
+      ),
+    );
+  }
+}
+
+// Product Card Widget
+class ProductCard extends StatelessWidget {
+  final Product product;
+  
+  const ProductCard({required this.product});
+  
+  @override
+  Widget build(BuildContext context) {
+    final cart = Provider.of<CartProvider>(context, listen: false);
+    
+    return Card(
+      elevation: 4,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Expanded(
+            flex: 3,
+            child: Container(
+              width: double.infinity,
+              decoration: BoxDecoration(
+                color: Colors.grey[200],
+                borderRadius: BorderRadius.vertical(
+                  top: Radius.circular(12),
+                ),
+              ),
+              child: Icon(
+                Icons.image,
+                size: 60,
+                color: Colors.grey[400],
+              ),
+            ),
+          ),
+          Expanded(
+            flex: 2,
+            child: Padding(
+              padding: EdgeInsets.all(12),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    product.name,
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 14,
+                    ),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  SizedBox(height: 8),
+                  Text(
+                    '\\\$\${product.price.toStringAsFixed(2)}',
+                    style: TextStyle(
+                      color: Colors.green[600],
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  Spacer(),
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      onPressed: () {
+                        cart.addItem(product);
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text('Added \${product.name} to cart!'),
+                            duration: Duration(seconds: 1),
+                            backgroundColor: Colors.green,
+                          ),
+                        );
+                      },
+                      style: ElevatedButton.styleFrom(
+                        padding: EdgeInsets.symmetric(vertical: 8),
+                      ),
+                      child: Text(
+                        'Add to Cart',
+                        style: TextStyle(fontSize: 12),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// Cart Screen
+class CartScreen extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Shopping Cart'),
+      ),
+      body: Consumer<CartProvider>(
+        builder: (context, cart, child) {
+          if (cart.itemCount == 0) {
+            return Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    Icons.shopping_cart_outlined,
+                    size: 100,
+                    color: Colors.grey[400],
+                  ),
+                  SizedBox(height: 20),
+                  Text(
+                    'Your cart is empty',
+                    style: TextStyle(
+                      fontSize: 24,
+                      color: Colors.grey[600],
+                    ),
+                  ),
+                  SizedBox(height: 20),
+                  ElevatedButton(
+                    onPressed: () => Navigator.pop(context),
+                    child: Text('Continue Shopping'),
+                  ),
+                ],
+              ),
+            );
+          }
+          
+          return Column(
+            children: [
+              Expanded(
+                child: ListView.builder(
+                  itemCount: cart.items.length,
+                  itemBuilder: (context, index) {
+                    final cartItem = cart.items.values.toList()[index];
+                    return CartItemTile(cartItem: cartItem);
+                  },
+                ),
+              ),
+              Container(
+                padding: EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black12,
+                      blurRadius: 4,
+                      offset: Offset(0, -2),
+                    ),
+                  ],
+                ),
+                child: Column(
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          'Total:',
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        Text(
+                          '\\\$\${cart.totalAmount.toStringAsFixed(2)}',
+                          style: TextStyle(
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.green[600],
+                          ),
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: 16),
+                    SizedBox(
+                      width: double.infinity,
+                      height: 50,
+                      child: ElevatedButton(
+                        onPressed: () {
+                          // Checkout logic here
+                          showDialog(
+                            context: context,
+                            builder: (_) => AlertDialog(
+                              title: Text('Checkout'),
+                              content: Text('Order placed successfully!'),
+                              actions: [
+                                TextButton(
+                                  onPressed: () {
+                                    cart.clear();
+                                    Navigator.of(context).pop();
+                                    Navigator.of(context).pop();
+                                  },
+                                  child: Text('OK'),
+                                ),
+                              ],
+                            ),
+                          );
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.green,
+                        ),
+                        child: Text(
+                          'Checkout',
+                          style: TextStyle(fontSize: 18),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          );
+        },
+      ),
+    );
+  }
+}
+
+// Cart Item Tile
+class CartItemTile extends StatelessWidget {
+  final CartItem cartItem;
+  
+  const CartItemTile({required this.cartItem});
+  
+  @override
+  Widget build(BuildContext context) {
+    final cart = Provider.of<CartProvider>(context, listen: false);
+    
+    return Card(
+      margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      child: Padding(
+        padding: EdgeInsets.all(16),
+        child: Row(
+          children: [
+            Container(
+              width: 60,
+              height: 60,
+              decoration: BoxDecoration(
+                color: Colors.grey[200],
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Icon(
+                Icons.image,
+                color: Colors.grey[400],
+              ),
+            ),
+            SizedBox(width: 16),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    cartItem.product.name,
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                    ),
+                  ),
+                  SizedBox(height: 4),
+                  Text(
+                    '\\\$\${cartItem.product.price.toStringAsFixed(2)} each',
+                    style: TextStyle(
+                      color: Colors.grey[600],
+                    ),
+                  ),
+                  SizedBox(height: 8),
+                  Text(
+                    'Total: \\\$\${cartItem.totalPrice.toStringAsFixed(2)}',
+                    style: TextStyle(
+                      fontWeight: FontWeight.w600,
+                      color: Colors.green[600],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Column(
+              children: [
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    IconButton(
+                      onPressed: cartItem.quantity > 1
+                          ? () => cart.updateQuantity(
+                                cartItem.product.id,
+                                cartItem.quantity - 1,
+                              )
+                          : null,
+                      icon: Icon(Icons.remove),
+                      iconSize: 20,
+                    ),
+                    Container(
+                      padding: EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                      decoration: BoxDecoration(
+                        border: Border.all(color: Colors.grey),
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                      child: Text(
+                        '\${cartItem.quantity}',
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                    IconButton(
+                      onPressed: () => cart.updateQuantity(
+                        cartItem.product.id,
+                        cartItem.quantity + 1,
+                      ),
+                      icon: Icon(Icons.add),
+                      iconSize: 20,
+                    ),
+                  ],
+                ),
+                TextButton(
+                  onPressed: () => cart.removeItem(cartItem.product.id),
+                  child: Text(
+                    'Remove',
+                    style: TextStyle(color: Colors.red),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}''',
+            isRunnable: true,
+          ),
+        ],
+      ),
   }
 
   List<LearningChapter> _getPerformanceChapters() {
