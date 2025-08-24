@@ -1546,7 +1546,782 @@ StackOverlayCard(
         ],
       ),
 
-      // More chapters will be added in subsequent tasks...
+      // Chapter 4: Interactive Exercises
+      const LearningChapter(
+        id: 'interactive-exercises',
+        sectionId: 'flutter-basics',
+        title: 'Interactive Exercises',
+        content: '''
+# Interactive Exercises
+
+Put your Flutter knowledge to the test with these hands-on exercises! Practice what you've learned about widgets, layouts, and basic Flutter concepts.
+
+## Exercise 1: Build Your First Widget
+
+Create a simple greeting widget that displays your name and a welcome message.
+
+**Task**: Create a widget that:
+- Shows "Welcome to Flutter!" as a title
+- Displays your name below the title
+- Uses different text styles for the title and name
+- Centers everything on the screen
+
+### Solution Structure
+```dart
+class GreetingWidget extends StatelessWidget {
+  final String name;
+  
+  const GreetingWidget({
+    Key? key,
+    required this.name,
+  }) : super(key: key);
+  
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text(
+            'Welcome to Flutter!',
+            style: TextStyle(
+              fontSize: 28,
+              fontWeight: FontWeight.bold,
+              color: Colors.blue,
+            ),
+          ),
+          SizedBox(height: 20),
+          Text(
+            'Hello, \$name!',
+            style: TextStyle(
+              fontSize: 20,
+              color: Colors.grey[600],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+```
+
+## Exercise 2: Layout Challenge
+
+Create a profile card layout using various layout widgets.
+
+**Task**: Build a profile card that contains:
+- A circular avatar at the top
+- Name and job title below the avatar
+- A row of social media icons
+- A bio text section
+- Action buttons at the bottom
+
+### Key Concepts Practiced
+- Container for styling and padding
+- Column for vertical arrangement
+- Row for horizontal arrangement
+- CircleAvatar for profile image
+- Styling with BoxDecoration
+
+### Solution Hints
+```dart
+class ProfileCard extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Container(
+        width: 300,
+        padding: EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(15),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.grey.withOpacity(0.3),
+              spreadRadius: 2,
+              blurRadius: 5,
+            ),
+          ],
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // Avatar section
+            CircleAvatar(
+              radius: 50,
+              backgroundImage: AssetImage('assets/profile.jpg'),
+            ),
+            SizedBox(height: 15),
+            
+            // Name and title
+            Text(
+              'John Doe',
+              style: TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            Text(
+              'Flutter Developer',
+              style: TextStyle(
+                fontSize: 16,
+                color: Colors.grey[600],
+              ),
+            ),
+            
+            SizedBox(height: 20),
+            
+            // Social media icons
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                Icon(Icons.facebook, color: Colors.blue),
+                Icon(Icons.link, color: Colors.blue),
+                Icon(Icons.email, color: Colors.red),
+              ],
+            ),
+            
+            SizedBox(height: 15),
+            
+            // Bio
+            Text(
+              'Passionate Flutter developer creating beautiful mobile experiences. Love clean code and great UX.',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                color: Colors.grey[700],
+                height: 1.4,
+              ),
+            ),
+            
+            SizedBox(height: 20),
+            
+            // Action buttons
+            Row(
+              children: [
+                Expanded(
+                  child: ElevatedButton(
+                    onPressed: () {},
+                    child: Text('Follow'),
+                  ),
+                ),
+                SizedBox(width: 10),
+                Expanded(
+                  child: OutlinedButton(
+                    onPressed: () {},
+                    child: Text('Message'),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+```
+
+## Exercise 3: Interactive Counter
+
+Build the classic Flutter counter with your own styling and enhancements.
+
+**Task**: Create an enhanced counter app that:
+- Shows the current count
+- Has increment and decrement buttons
+- Changes color based on the count value
+- Shows different messages for different count ranges
+- Resets to zero with a reset button
+
+### Key Concepts Practiced
+- StatefulWidget and state management
+- Conditional styling
+- Button interactions
+- setState() method
+
+### Solution Framework
+```dart
+class EnhancedCounter extends StatefulWidget {
+  @override
+  _EnhancedCounterState createState() => _EnhancedCounterState();
+}
+
+class _EnhancedCounterState extends State<EnhancedCounter> {
+  int _counter = 0;
+  
+  void _incrementCounter() {
+    setState(() {
+      _counter++;
+    });
+  }
+  
+  void _decrementCounter() {
+    setState(() {
+      if (_counter > 0) {
+        _counter--;
+      }
+    });
+  }
+  
+  void _resetCounter() {
+    setState(() {
+      _counter = 0;
+    });
+  }
+  
+  Color _getCounterColor() {
+    if (_counter == 0) return Colors.grey;
+    if (_counter < 5) return Colors.blue;
+    if (_counter < 10) return Colors.green;
+    return Colors.red;
+  }
+  
+  String _getCounterMessage() {
+    if (_counter == 0) return 'Start counting!';
+    if (_counter < 5) return 'Getting started';
+    if (_counter < 10) return 'Good progress!';
+    return 'Wow, that\'s high!';
+  }
+  
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Enhanced Counter'),
+      ),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              _getCounterMessage(),
+              style: TextStyle(
+                fontSize: 18,
+                color: Colors.grey[600],
+              ),
+            ),
+            SizedBox(height: 20),
+            Container(
+              width: 150,
+              height: 150,
+              decoration: BoxDecoration(
+                color: _getCounterColor().withOpacity(0.1),
+                border: Border.all(
+                  color: _getCounterColor(),
+                  width: 3,
+                ),
+                borderRadius: BorderRadius.circular(75),
+              ),
+              child: Center(
+                child: Text(
+                  '\$_counter',
+                  style: TextStyle(
+                    fontSize: 48,
+                    fontWeight: FontWeight.bold,
+                    color: _getCounterColor(),
+                  ),
+                ),
+              ),
+            ),
+            SizedBox(height: 30),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                FloatingActionButton(
+                  onPressed: _decrementCounter,
+                  child: Icon(Icons.remove),
+                  backgroundColor: Colors.red,
+                  heroTag: 'decrement',
+                ),
+                FloatingActionButton(
+                  onPressed: _resetCounter,
+                  child: Icon(Icons.refresh),
+                  backgroundColor: Colors.grey,
+                  heroTag: 'reset',
+                ),
+                FloatingActionButton(
+                  onPressed: _incrementCounter,
+                  child: Icon(Icons.add),
+                  backgroundColor: Colors.green,
+                  heroTag: 'increment',
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+```
+
+## Exercise 4: Custom Card Gallery
+
+Create a scrollable gallery of custom cards showcasing different layout techniques.
+
+**Task**: Build a gallery that demonstrates:
+- Custom card designs with different layouts
+- Horizontal scrolling
+- Various alignment and positioning techniques
+- Mix of images, text, and icons
+
+### Key Concepts Practiced
+- ListView and SingleChildScrollView
+- Custom card layouts
+- Asset management
+- Mixed layout patterns
+
+### Challenge Points
+1. Create at least 5 different card designs
+2. Each card should showcase a different layout pattern
+3. Include proper spacing and visual hierarchy
+4. Add subtle animations or hover effects
+
+## Exercise 5: Responsive Grid
+
+Build a responsive photo grid that adapts to different screen sizes.
+
+**Task**: Create a photo grid that:
+- Shows 2 columns on phones
+- Shows 3 columns on tablets
+- Shows 4 columns on larger screens
+- Has proper aspect ratios for images
+- Includes overlay text and icons
+
+### Key Concepts Practiced
+- MediaQuery for responsive design
+- GridView with dynamic column count
+- AspectRatio widget
+- Stack for overlay content
+
+### Bonus Challenges
+- Add a search functionality
+- Implement pull-to-refresh
+- Add image zoom capability
+- Include loading states
+
+## Testing Your Knowledge
+
+After completing these exercises, you should be comfortable with:
+
+✅ **Widget Composition**: Combining multiple widgets to create complex UIs
+✅ **Layout Systems**: Using Row, Column, Stack, and other layout widgets effectively
+✅ **State Management**: Managing widget state with StatefulWidget
+✅ **Responsive Design**: Creating UIs that work across different screen sizes
+✅ **Styling**: Applying colors, padding, margins, and decorations
+✅ **User Interaction**: Handling button presses and user input
+
+## Next Steps
+
+Once you've completed these exercises:
+1. Experiment with different styling approaches
+2. Try combining layouts in creative ways
+3. Add animations to make your UIs more engaging
+4. Move on to more advanced state management patterns
+
+Remember: The best way to learn Flutter is by building! Don't be afraid to experiment and make mistakes – that's how you'll become proficient.
+''',
+        order: 4,
+        estimatedReadTime: 45,
+        prerequisites: [
+          'Basic Flutter widget knowledge',
+          'Understanding of StatelessWidget vs StatefulWidget',
+          'Layout fundamentals (Row, Column, Container)',
+          'Basic Dart syntax and classes',
+        ],
+        learningObjectives: [
+          'Practice building real Flutter widgets from scratch',
+          'Apply layout concepts in practical scenarios',
+          'Understand state management with StatefulWidget',
+          'Develop problem-solving skills for UI challenges',
+          'Build confidence in Flutter development',
+          'Learn debugging techniques for layout issues',
+        ],
+        codeExamples: [
+          CodeExample(
+            id: 'todo-app',
+            title: 'Interactive Todo List',
+            explanation: 'A fully functional todo list demonstrating state management, list handling, and user interactions.',
+            code: '''
+class TodoApp extends StatefulWidget {
+  @override
+  _TodoAppState createState() => _TodoAppState();
+}
+
+class _TodoAppState extends State<TodoApp> {
+  List<Todo> _todos = [];
+  final _controller = TextEditingController();
+
+  void _addTodo() {
+    if (_controller.text.isNotEmpty) {
+      setState(() {
+        _todos.add(Todo(
+          id: DateTime.now().millisecondsSinceEpoch,
+          title: _controller.text,
+          isCompleted: false,
+        ));
+        _controller.clear();
+      });
+    }
+  }
+
+  void _toggleTodo(int id) {
+    setState(() {
+      final index = _todos.indexWhere((todo) => todo.id == id);
+      if (index != -1) {
+        _todos[index].isCompleted = !_todos[index].isCompleted;
+      }
+    });
+  }
+
+  void _deleteTodo(int id) {
+    setState(() {
+      _todos.removeWhere((todo) => todo.id == id);
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Todo List Exercise'),
+        backgroundColor: Colors.teal,
+      ),
+      body: Column(
+        children: [
+          // Add todo section
+          Padding(
+            padding: EdgeInsets.all(16),
+            child: Row(
+              children: [
+                Expanded(
+                  child: TextField(
+                    controller: _controller,
+                    decoration: InputDecoration(
+                      hintText: 'Enter a todo item...',
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                    onSubmitted: (_) => _addTodo(),
+                  ),
+                ),
+                SizedBox(width: 8),
+                ElevatedButton(
+                  onPressed: _addTodo,
+                  child: Icon(Icons.add),
+                  style: ElevatedButton.styleFrom(
+                    shape: CircleBorder(),
+                    padding: EdgeInsets.all(16),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          
+          // Todos list
+          Expanded(
+            child: _todos.isEmpty
+                ? Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.checklist,
+                          size: 64,
+                          color: Colors.grey[400],
+                        ),
+                        SizedBox(height: 16),
+                        Text(
+                          'No todos yet!',
+                          style: TextStyle(
+                            fontSize: 18,
+                            color: Colors.grey[600],
+                          ),
+                        ),
+                      ],
+                    ),
+                  )
+                : ListView.builder(
+                    padding: EdgeInsets.symmetric(horizontal: 16),
+                    itemCount: _todos.length,
+                    itemBuilder: (context, index) {
+                      final todo = _todos[index];
+                      return Card(
+                        margin: EdgeInsets.only(bottom: 8),
+                        child: ListTile(
+                          leading: Checkbox(
+                            value: todo.isCompleted,
+                            onChanged: (_) => _toggleTodo(todo.id),
+                          ),
+                          title: Text(
+                            todo.title,
+                            style: TextStyle(
+                              decoration: todo.isCompleted 
+                                  ? TextDecoration.lineThrough 
+                                  : null,
+                              color: todo.isCompleted 
+                                  ? Colors.grey 
+                                  : null,
+                            ),
+                          ),
+                          trailing: IconButton(
+                            icon: Icon(Icons.delete, color: Colors.red),
+                            onPressed: () => _deleteTodo(todo.id),
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+          ),
+          
+          // Statistics
+          Container(
+            padding: EdgeInsets.all(16),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                _buildStatItem(
+                  'Total', 
+                  _todos.length.toString(), 
+                  Colors.blue,
+                ),
+                _buildStatItem(
+                  'Completed', 
+                  _todos.where((t) => t.isCompleted).length.toString(), 
+                  Colors.green,
+                ),
+                _buildStatItem(
+                  'Pending', 
+                  _todos.where((t) => !t.isCompleted).length.toString(), 
+                  Colors.orange,
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildStatItem(String label, String value, Color color) {
+    return Column(
+      children: [
+        Text(
+          value,
+          style: TextStyle(
+            fontSize: 24,
+            fontWeight: FontWeight.bold,
+            color: color,
+          ),
+        ),
+        Text(
+          label,
+          style: TextStyle(
+            color: Colors.grey[600],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class Todo {
+  final int id;
+  final String title;
+  bool isCompleted;
+
+  Todo({
+    required this.id,
+    required this.title,
+    required this.isCompleted,
+  });
+}''',
+            isRunnable: true,
+          ),
+          CodeExample(
+            id: 'weather-card',
+            title: 'Weather Card Exercise',
+            explanation: 'Create a beautiful weather card showing current conditions with custom styling and layout techniques.',
+            code: '''
+class WeatherCard extends StatelessWidget {
+  final String city;
+  final int temperature;
+  final String condition;
+  final String iconCode;
+  final int humidity;
+  final int windSpeed;
+
+  const WeatherCard({
+    Key? key,
+    required this.city,
+    required this.temperature,
+    required this.condition,
+    required this.iconCode,
+    required this.humidity,
+    required this.windSpeed,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      margin: EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: _getGradientColors(),
+        ),
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.2),
+            spreadRadius: 2,
+            blurRadius: 10,
+            offset: Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Padding(
+        padding: EdgeInsets.all(24),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Header
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      city,
+                      style: TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                    ),
+                    Text(
+                      condition,
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: Colors.white70,
+                      ),
+                    ),
+                  ],
+                ),
+                Icon(
+                  _getWeatherIcon(),
+                  size: 60,
+                  color: Colors.white,
+                ),
+              ],
+            ),
+            
+            SizedBox(height: 20),
+            
+            // Temperature
+            Text(
+              '\${temperature}°',
+              style: TextStyle(
+                fontSize: 72,
+                fontWeight: FontWeight.w100,
+                color: Colors.white,
+                height: 0.9,
+              ),
+            ),
+            
+            SizedBox(height: 20),
+            
+            // Weather details
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                _buildDetailItem(
+                  icon: Icons.water_drop,
+                  label: 'Humidity',
+                  value: '\${humidity}%',
+                ),
+                _buildDetailItem(
+                  icon: Icons.air,
+                  label: 'Wind',
+                  value: '\${windSpeed} km/h',
+                ),
+                _buildDetailItem(
+                  icon: Icons.thermostat,
+                  label: 'Feels like',
+                  value: '\${temperature + 2}°',
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDetailItem({
+    required IconData icon,
+    required String label,
+    required String value,
+  }) {
+    return Column(
+      children: [
+        Icon(
+          icon,
+          color: Colors.white70,
+          size: 20,
+        ),
+        SizedBox(height: 4),
+        Text(
+          value,
+          style: TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        Text(
+          label,
+          style: TextStyle(
+            color: Colors.white70,
+            fontSize: 12,
+          ),
+        ),
+      ],
+    );
+  }
+
+  List<Color> _getGradientColors() {
+    switch (condition.toLowerCase()) {
+      case 'sunny':
+        return [Colors.orange, Colors.amber];
+      case 'rainy':
+        return [Colors.blue[700]!, Colors.blue[500]!];
+      case 'cloudy':
+        return [Colors.grey[600]!, Colors.grey[400]!];
+      default:
+        return [Colors.blue[400]!, Colors.blue[200]!];
+    }
+  }
+
+  IconData _getWeatherIcon() {
+    switch (condition.toLowerCase()) {
+      case 'sunny':
+        return Icons.wb_sunny;
+      case 'rainy':
+        return Icons.grain;
+      case 'cloudy':
+        return Icons.wb_cloudy;
+      default:
+        return Icons.wb_sunny;
+    }
+  }
+}''',
+            isRunnable: true,
+          ),
+        ],
+      ),
     ];
   }
 
