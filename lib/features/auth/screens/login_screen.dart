@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import '../../../core/constants/app_constants.dart';
 import '../../../core/utils/extensions.dart';
 import '../../../core/utils/validators.dart';
 import '../../../shared/widgets/custom_text_field.dart';
 import '../../../shared/widgets/custom_button.dart';
+import '../../../core/services/router_service.dart';
 import '../providers/auth_provider.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
@@ -40,7 +42,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     if (mounted) {
       if (success) {
         context.showSuccessSnackBar('Login successful!');
-        Navigator.pushReplacementNamed(context, '/home');
+        context.go(AppRoutes.home);
       } else {
         final errorMessage = ref.read(authProvider).errorMessage ?? 
                            AppStrings.invalidCredentials;
