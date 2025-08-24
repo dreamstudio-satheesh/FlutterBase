@@ -1,22 +1,23 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/constants/app_constants.dart';
 import '../../../core/utils/extensions.dart';
 import '../../../core/utils/validators.dart';
 import '../../../shared/widgets/custom_text_field.dart';
 import '../../../shared/widgets/custom_button.dart';
+import '../providers/auth_provider.dart';
 
-class LoginScreen extends StatefulWidget {
+class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
 
   @override
-  State<LoginScreen> createState() => _LoginScreenState();
+  ConsumerState<LoginScreen> createState() => _LoginScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
+class _LoginScreenState extends ConsumerState<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
   final _usernameController = TextEditingController();
   final _passwordController = TextEditingController();
-  bool _isLoading = false;
   bool _obscurePassword = true;
 
   @override
@@ -29,39 +30,30 @@ class _LoginScreenState extends State<LoginScreen> {
   Future<void> _handleLogin() async {
     if (!_formKey.currentState!.validate()) return;
 
-    setState(() => _isLoading = true);
     context.unfocus();
 
-    try {
-      // Simulate network request
-      await Future.delayed(const Duration(milliseconds: 800));
+    final username = _usernameController.text.trim();
+    final password = _passwordController.text;
 
-      final username = _usernameController.text.trim();
-      final password = _passwordController.text;
+    final success = await ref.read(authProvider.notifier).login(username, password);
 
-      if (username == 'admin' && password == '1234') {
-        if (mounted) {
-          context.showSuccessSnackBar('Login successful!');
-          Navigator.pushReplacementNamed(context, '/home');
-        }
+    if (mounted) {
+      if (success) {
+        context.showSuccessSnackBar('Login successful!');
+        Navigator.pushReplacementNamed(context, '/home');
       } else {
-        if (mounted) {
-          context.showErrorSnackBar(AppStrings.invalidCredentials);
-        }
-      }
-    } catch (e) {
-      if (mounted) {
-        context.showErrorSnackBar('Login failed. Please try again.');
-      }
-    } finally {
-      if (mounted) {
-        setState(() => _isLoading = false);
+        final errorMessage = ref.read(authProvider).errorMessage ?? 
+                           AppStrings.invalidCredentials;
+        context.showErrorSnackBar(errorMessage);
       }
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final authState = ref.watch(authProvider);
+    final isLoading = authState.isLoading;
+
     return Scaffold(
       body: SafeArea(
         child: SingleChildScrollView(
@@ -84,7 +76,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 const SizedBox(height: AppConstants.marginLarge),
                 
                 // Login Button
-                _buildLoginButton(),
+                _buildLoginButton(isLoading),
                 
                 const SizedBox(height: AppConstants.marginMedium),
                 
@@ -141,7 +133,7 @@ class _LoginScreenState extends State<LoginScreen> {
           prefixIcon: Icons.person_outline,
           validator: AppValidators.validateUsername,
           textInputAction: TextInputAction.next,
-          enabled: !_isLoading,
+          enabled: !isLoading,
         ),
         const SizedBox(height: AppConstants.marginMedium),
         CustomTextField(
@@ -159,16 +151,16 @@ class _LoginScreenState extends State<LoginScreen> {
           validator: AppValidators.validatePassword,
           textInputAction: TextInputAction.done,
           onSubmitted: (_) => _handleLogin(),
-          enabled: !_isLoading,
+          enabled: !isLoading,
         ),
       ],
     );
   }
 
-  Widget _buildLoginButton() {
+  Widget _buildLoginButton(bool isLoading) {
     return CustomButton(
-      onPressed: _isLoading ? null : _handleLogin,
-      isLoading: _isLoading,
+      onPressed: isLoading ? null : _handleLogin,
+      isLoading: isLoading,
       child: Text(
         AppStrings.loginButton,
         style: const TextStyle(
