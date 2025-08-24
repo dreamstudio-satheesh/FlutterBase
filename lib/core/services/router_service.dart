@@ -5,6 +5,7 @@ import '../../features/auth/screens/splash_screen.dart';
 import '../../features/auth/screens/login_screen.dart';
 import '../../features/learning/screens/home_screen.dart';
 import '../../features/auth/providers/auth_provider.dart';
+import 'navigation_service.dart';
 
 /// Application routes
 class AppRoutes {
@@ -29,30 +30,13 @@ class AppRoutes {
 final routerProvider = Provider<GoRouter>((ref) {
   final authState = ref.watch(authProvider);
   
-  return GoRouter(
+  final router = GoRouter(
     debugLogDiagnostics: true,
     initialLocation: AppRoutes.splash,
+    navigatorKey: NavigationService.instance._router?.routerDelegate.navigatorKey,
     redirect: (context, state) {
-      final isAuthenticated = authState.isAuthenticated;
-      final isLoading = authState.isLoading;
-      
-      // Don't redirect while loading
-      if (isLoading) return null;
-      
-      final isOnSplash = state.matchedLocation == AppRoutes.splash;
-      final isOnLogin = state.matchedLocation == AppRoutes.login;
-      
-      // If not authenticated and not on auth screens, go to login
-      if (!isAuthenticated && !isOnLogin && !isOnSplash) {
-        return AppRoutes.login;
-      }
-      
-      // If authenticated and on auth screens, go to home
-      if (isAuthenticated && (isOnLogin || isOnSplash)) {
-        return AppRoutes.home;
-      }
-      
-      return null;
+      // Use RouteGuard for centralized redirect logic
+      return RouteGuard.getRedirectRoute(state.matchedLocation, ref);
     },
     routes: [
       // Splash Screen
@@ -122,6 +106,11 @@ final routerProvider = Provider<GoRouter>((ref) {
     ],
     errorBuilder: (context, state) => _ErrorScreen(error: state.error),
   );
+  
+  // Set the router instance in NavigationService
+  NavigationService.instance.setRouter(router);
+  
+  return router;
 });
 
 /// Error screen for navigation errors
