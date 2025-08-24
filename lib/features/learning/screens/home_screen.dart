@@ -149,6 +149,7 @@ class HomeScreen extends ConsumerWidget {
           icon: Icons.flutter_dash,
           color: AppConstants.flutterBasicsColor,
           progress: 0.0,
+          onTap: () => NavigationService.instance.goToSection('flutter-basics'),
         ),
         _buildSectionCard(
           context,
@@ -157,6 +158,7 @@ class HomeScreen extends ConsumerWidget {
           icon: Icons.settings_suggest_outlined,
           color: AppConstants.stateManagementColor,
           progress: 0.0,
+          onTap: () => NavigationService.instance.goToSection('state-management'),
         ),
         _buildSectionCard(
           context,
@@ -165,6 +167,7 @@ class HomeScreen extends ConsumerWidget {
           icon: Icons.speed_outlined,
           color: AppConstants.performanceColor,
           progress: 0.0,
+          onTap: () => NavigationService.instance.goToSection('performance'),
         ),
       ],
     );
@@ -177,12 +180,13 @@ class HomeScreen extends ConsumerWidget {
     required IconData icon,
     required Color color,
     required double progress,
+    VoidCallback? onTap,
   }) {
     return Container(
       margin: const EdgeInsets.only(bottom: AppConstants.marginMedium),
       child: Card(
         child: InkWell(
-          onTap: () {
+          onTap: onTap ?? () {
             context.showSnackBar('$title section coming soon!');
           },
           borderRadius: BorderRadius.circular(AppConstants.borderRadiusMedium),

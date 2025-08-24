@@ -4,6 +4,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../features/auth/screens/splash_screen.dart';
 import '../../features/auth/screens/login_screen.dart';
 import '../../features/learning/screens/home_screen.dart';
+import '../../features/learning/screens/sections_screen.dart';
+import '../../features/learning/screens/section_detail_screen.dart';
 import '../../features/auth/providers/auth_provider.dart';
 import 'navigation_service.dart';
 
@@ -64,7 +66,7 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: AppRoutes.sections,
         name: 'sections',
-        builder: (context, state) => const Placeholder(), // TODO: Create SectionsScreen
+        builder: (context, state) => const SectionsScreen(),
         routes: [
           // Individual Section
           GoRoute(
@@ -72,7 +74,7 @@ final routerProvider = Provider<GoRouter>((ref) {
             name: 'section',
             builder: (context, state) {
               final sectionId = state.pathParameters['sectionId']!;
-              return Placeholder(); // TODO: Create SectionDetailScreen
+              return SectionDetailScreen(sectionId: sectionId);
             },
             routes: [
               // Chapter within Section
