@@ -668,6 +668,884 @@ StyledContainer(
         ],
       ),
 
+      // Chapter 3: Layouts
+      const LearningChapter(
+        id: 'layouts',
+        sectionId: 'flutter-basics',
+        title: 'Mastering Layouts',
+        content: '''
+# Flutter Layouts Mastery 📐
+
+Building beautiful, responsive layouts is at the heart of Flutter development. Understanding how to arrange widgets effectively will transform your app's user experience.
+
+## Layout Fundamentals
+
+In Flutter, everything is about **composition**. You build complex layouts by combining simple layout widgets in a tree structure.
+
+### Key Layout Principles
+
+1. **Constraints flow down** - Parent widgets pass size constraints to children
+2. **Sizes flow up** - Children report their size back to parents  
+3. **Parent sets position** - Parents decide where to place children
+
+## Essential Layout Widgets
+
+### 1. **Container** - The Swiss Army Knife
+
+Container is the most versatile layout widget for single-child layouts.
+
+```dart
+Container(
+  width: 200,
+  height: 150,
+  padding: EdgeInsets.all(16),
+  margin: EdgeInsets.symmetric(vertical: 8),
+  decoration: BoxDecoration(
+    color: Colors.blue,
+    borderRadius: BorderRadius.circular(12),
+    boxShadow: [
+      BoxShadow(
+        color: Colors.blue.withOpacity(0.3),
+        blurRadius: 8,
+        offset: Offset(0, 4),
+      ),
+    ],
+  ),
+  child: Text(
+    'Beautiful Container',
+    style: TextStyle(
+      color: Colors.white,
+      fontSize: 18,
+      fontWeight: FontWeight.bold,
+    ),
+  ),
+)
+```
+
+### 2. **Row & Column** - Linear Layouts
+
+Perfect for arranging widgets in horizontal or vertical lines.
+
+#### Row Layout (Horizontal)
+```dart
+Row(
+  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+  crossAxisAlignment: CrossAxisAlignment.center,
+  children: [
+    Icon(Icons.home, size: 32, color: Colors.blue),
+    Icon(Icons.favorite, size: 32, color: Colors.red),
+    Icon(Icons.settings, size: 32, color: Colors.grey),
+  ],
+)
+```
+
+#### Column Layout (Vertical)
+```dart
+Column(
+  mainAxisAlignment: MainAxisAlignment.center,
+  crossAxisAlignment: CrossAxisAlignment.start,
+  children: [
+    Text('Welcome', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
+    Text('to Flutter Layouts', style: TextStyle(fontSize: 18)),
+    SizedBox(height: 16),
+    ElevatedButton(
+      onPressed: () => print('Button pressed!'),
+      child: Text('Get Started'),
+    ),
+  ],
+)
+```
+
+## MainAxis vs CrossAxis
+
+Understanding these concepts is crucial for mastering Row and Column layouts:
+
+### For Row (Horizontal):
+- **MainAxis** = Horizontal (left to right)
+- **CrossAxis** = Vertical (top to bottom)
+
+### For Column (Vertical):
+- **MainAxis** = Vertical (top to bottom)  
+- **CrossAxis** = Horizontal (left to right)
+
+## Alignment Options
+
+### MainAxisAlignment
+- `start` - Beginning of the main axis
+- `end` - End of the main axis
+- `center` - Center of the main axis
+- `spaceBetween` - Space between children
+- `spaceAround` - Space around children
+- `spaceEvenly` - Even space distribution
+
+### CrossAxisAlignment
+- `start` - Beginning of the cross axis
+- `end` - End of the cross axis
+- `center` - Center of the cross axis
+- `stretch` - Stretch to fill cross axis
+- `baseline` - Align text baselines
+
+## Flexible Layouts
+
+### 3. **Expanded** - Fill Available Space
+
+```dart
+Row(
+  children: [
+    Container(
+      width: 50,
+      height: 50,
+      color: Colors.red,
+    ),
+    Expanded(
+      child: Container(
+        height: 50,
+        color: Colors.blue,
+        child: Center(child: Text('Expands to fill space')),
+      ),
+    ),
+    Container(
+      width: 50,
+      height: 50,
+      color: Colors.green,
+    ),
+  ],
+)
+```
+
+### 4. **Flexible** - Flexible Space Usage
+
+```dart
+Column(
+  children: [
+    Flexible(
+      flex: 1,
+      child: Container(
+        width: double.infinity,
+        color: Colors.red,
+        child: Center(child: Text('Flex: 1')),
+      ),
+    ),
+    Flexible(
+      flex: 2,
+      child: Container(
+        width: double.infinity,
+        color: Colors.blue,
+        child: Center(child: Text('Flex: 2')),
+      ),
+    ),
+    Flexible(
+      flex: 1,
+      child: Container(
+        width: double.infinity,
+        color: Colors.green,
+        child: Center(child: Text('Flex: 1')),
+      ),
+    ),
+  ],
+)
+```
+
+## Advanced Layout Widgets
+
+### 5. **Stack** - Overlapping Widgets
+
+Perfect for creating layered UIs with overlapping elements.
+
+```dart
+Stack(
+  children: [
+    Container(
+      width: 200,
+      height: 200,
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [Colors.purple, Colors.blue],
+        ),
+        borderRadius: BorderRadius.circular(16),
+      ),
+    ),
+    Positioned(
+      top: 20,
+      left: 20,
+      child: Icon(
+        Icons.star,
+        color: Colors.white,
+        size: 32,
+      ),
+    ),
+    Positioned(
+      bottom: 20,
+      right: 20,
+      child: Text(
+        'Overlay Text',
+        style: TextStyle(
+          color: Colors.white,
+          fontWeight: FontWeight.bold,
+        ),
+      ),
+    ),
+  ],
+)
+```
+
+### 6. **Wrap** - Flowing Layouts
+
+When you need widgets to wrap to the next line/column automatically.
+
+```dart
+Wrap(
+  spacing: 8.0,
+  runSpacing: 8.0,
+  children: [
+    Chip(label: Text('Flutter')),
+    Chip(label: Text('Dart')),
+    Chip(label: Text('Mobile')),
+    Chip(label: Text('Development')),
+    Chip(label: Text('UI')),
+    Chip(label: Text('Cross Platform')),
+    Chip(label: Text('Google')),
+    Chip(label: Text('Open Source')),
+  ],
+)
+```
+
+### 7. **GridView** - Grid Layouts
+
+Perfect for displaying items in a grid pattern.
+
+```dart
+GridView.count(
+  crossAxisCount: 2,
+  crossAxisSpacing: 16,
+  mainAxisSpacing: 16,
+  padding: EdgeInsets.all(16),
+  children: [
+    Container(
+      decoration: BoxDecoration(
+        color: Colors.red,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Center(child: Text('Item 1', style: TextStyle(color: Colors.white))),
+    ),
+    Container(
+      decoration: BoxDecoration(
+        color: Colors.green,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Center(child: Text('Item 2', style: TextStyle(color: Colors.white))),
+    ),
+    Container(
+      decoration: BoxDecoration(
+        color: Colors.blue,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Center(child: Text('Item 3', style: TextStyle(color: Colors.white))),
+    ),
+    Container(
+      decoration: BoxDecoration(
+        color: Colors.orange,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Center(child: Text('Item 4', style: TextStyle(color: Colors.white))),
+    ),
+  ],
+)
+```
+
+## Responsive Design Patterns
+
+### MediaQuery for Screen Information
+
+```dart
+Widget build(BuildContext context) {
+  final screenWidth = MediaQuery.of(context).size.width;
+  final isTablet = screenWidth > 600;
+  
+  return Container(
+    padding: EdgeInsets.all(isTablet ? 32 : 16),
+    child: Column(
+      children: [
+        Text(
+          'Responsive Design',
+          style: TextStyle(
+            fontSize: isTablet ? 32 : 24,
+          ),
+        ),
+        // Adapt layout based on screen size
+        if (isTablet)
+          Row(
+            children: [
+              Expanded(child: _buildContent()),
+              SizedBox(width: 32),
+              Expanded(child: _buildSidebar()),
+            ],
+          )
+        else
+          Column(
+            children: [
+              _buildContent(),
+              SizedBox(height: 16),
+              _buildSidebar(),
+            ],
+          ),
+      ],
+    ),
+  );
+}
+```
+
+### LayoutBuilder for Constraint-Based Design
+
+```dart
+LayoutBuilder(
+  builder: (context, constraints) {
+    if (constraints.maxWidth > 600) {
+      // Wide layout (tablet/desktop)
+      return Row(
+        children: [
+          Expanded(flex: 2, child: _buildMainContent()),
+          Expanded(flex: 1, child: _buildSidebar()),
+        ],
+      );
+    } else {
+      // Narrow layout (mobile)
+      return Column(
+        children: [
+          _buildMainContent(),
+          _buildSidebar(),
+        ],
+      );
+    }
+  },
+)
+```
+
+## Common Layout Patterns
+
+### 1. **Card Layout**
+```dart
+Card(
+  elevation: 4,
+  margin: EdgeInsets.all(16),
+  child: Padding(
+    padding: EdgeInsets.all(16),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text('Card Title', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+        SizedBox(height: 8),
+        Text('Card subtitle or description goes here.'),
+        SizedBox(height: 16),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: [
+            TextButton(onPressed: () {}, child: Text('CANCEL')),
+            SizedBox(width: 8),
+            ElevatedButton(onPressed: () {}, child: Text('OK')),
+          ],
+        ),
+      ],
+    ),
+  ),
+)
+```
+
+### 2. **List Item Layout**
+```dart
+ListTile(
+  leading: CircleAvatar(
+    backgroundColor: Colors.blue,
+    child: Icon(Icons.person, color: Colors.white),
+  ),
+  title: Text('John Doe'),
+  subtitle: Text('Flutter Developer'),
+  trailing: Icon(Icons.arrow_forward_ios),
+  onTap: () => print('Tapped!'),
+)
+```
+
+### 3. **Bottom Sheet Layout**
+```dart
+Container(
+  padding: EdgeInsets.all(16),
+  decoration: BoxDecoration(
+    color: Colors.white,
+    borderRadius: BorderRadius.only(
+      topLeft: Radius.circular(16),
+      topRight: Radius.circular(16),
+    ),
+  ),
+  child: Column(
+    mainAxisSize: MainAxisSize.min,
+    children: [
+      Container(
+        width: 40,
+        height: 4,
+        decoration: BoxDecoration(
+          color: Colors.grey[300],
+          borderRadius: BorderRadius.circular(2),
+        ),
+      ),
+      SizedBox(height: 16),
+      Text('Bottom Sheet', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+      SizedBox(height: 16),
+      // Content goes here
+    ],
+  ),
+)
+```
+
+## Layout Debugging Tips
+
+### 1. **Container with Color**
+Add colored containers to visualize layout boundaries:
+```dart
+Container(
+  color: Colors.red.withOpacity(0.3), // Temporary debug color
+  child: YourWidget(),
+)
+```
+
+### 2. **Flutter Inspector**
+Use Flutter Inspector in your IDE to:
+- Visualize the widget tree
+- See widget properties
+- Understand layout constraints
+
+### 3. **Debug Paint**
+Show widget boundaries in debug mode:
+```dart
+import 'package:flutter/rendering.dart';
+
+void main() {
+  debugPaintSizeEnabled = true; // Shows widget boundaries
+  runApp(MyApp());
+}
+```
+
+## Best Practices
+
+### ✅ **Do:**
+- Use `const` constructors for static layouts
+- Choose the right layout widget for your use case
+- Consider responsive design from the start
+- Use `Expanded` and `Flexible` for dynamic sizing
+- Test on different screen sizes
+
+### ❌ **Don't:**
+- Nest unnecessary layout widgets
+- Hardcode pixel values for responsive layouts
+- Ignore overflow errors
+- Use `Row`/`Column` with many children (use `ListView` instead)
+- Forget about accessibility in your layouts
+
+## Layout Performance Tips
+
+1. **Avoid deep widget trees** - Keep layouts shallow
+2. **Use ListView.builder** for long lists instead of Column with many children
+3. **Implement lazy loading** for expensive layouts
+4. **Profile your layouts** using Flutter DevTools
+5. **Consider using Slivers** for complex scrolling layouts
+
+## Next Steps
+
+Master these layout concepts to build:
+- ✅ Responsive designs that work on all screen sizes
+- ✅ Complex UIs with proper widget composition  
+- ✅ Smooth scrolling experiences
+- ✅ Professional-looking app interfaces
+
+> 💡 **Pro Tip**: Start with simple layouts and gradually add complexity. The Flutter Inspector is your best friend for understanding layout behavior!
+        ''',
+        order: 3,
+        estimatedReadTime: 20,
+        codeExamples: [
+          CodeExample(
+            id: 'responsive-card',
+            title: 'Responsive Card Layout',
+            code: '''
+class ResponsiveCard extends StatelessWidget {
+  final String title;
+  final String subtitle;
+  final IconData icon;
+  final VoidCallback? onTap;
+
+  const ResponsiveCard({
+    Key? key,
+    required this.title,
+    required this.subtitle,
+    required this.icon,
+    this.onTap,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final isWide = constraints.maxWidth > 400;
+        
+        return Card(
+          elevation: 4,
+          margin: EdgeInsets.all(16),
+          child: InkWell(
+            onTap: onTap,
+            borderRadius: BorderRadius.circular(12),
+            child: Padding(
+              padding: EdgeInsets.all(isWide ? 24 : 16),
+              child: isWide
+                  ? Row(
+                      children: [
+                        _buildIcon(),
+                        SizedBox(width: 24),
+                        Expanded(child: _buildContent()),
+                        Icon(Icons.arrow_forward_ios),
+                      ],
+                    )
+                  : Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            _buildIcon(),
+                            Spacer(),
+                            Icon(Icons.arrow_forward_ios),
+                          ],
+                        ),
+                        SizedBox(height: 16),
+                        _buildContent(),
+                      ],
+                    ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildIcon() {
+    return Container(
+      padding: EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: Colors.blue.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Icon(
+        icon,
+        color: Colors.blue,
+        size: 32,
+      ),
+    );
+  }
+
+  Widget _buildContent() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          title,
+          style: TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        SizedBox(height: 4),
+        Text(
+          subtitle,
+          style: TextStyle(
+            color: Colors.grey[600],
+            fontSize: 14,
+          ),
+        ),
+      ],
+    );
+  }
+}''',
+            language: 'dart',
+            explanation: 'A responsive card that adapts its layout based on available width, switching between row and column layouts.',
+            isRunnable: true,
+          ),
+          CodeExample(
+            id: 'flexible-layout',
+            title: 'Flexible Space Distribution',
+            code: '''
+class FlexibleDemo extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text('Flexible Layout Demo')),
+      body: Padding(
+        padding: EdgeInsets.all(16),
+        child: Column(
+          children: [
+            // Example 1: Basic Flexible
+            Text('Basic Flexible Distribution', 
+                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            SizedBox(height: 8),
+            Container(
+              height: 100,
+              child: Row(
+                children: [
+                  Container(
+                    width: 60,
+                    color: Colors.red,
+                    child: Center(child: Text('Fixed')),
+                  ),
+                  Flexible(
+                    flex: 1,
+                    child: Container(
+                      color: Colors.blue,
+                      child: Center(child: Text('Flex: 1')),
+                    ),
+                  ),
+                  Flexible(
+                    flex: 2,
+                    child: Container(
+                      color: Colors.green,
+                      child: Center(child: Text('Flex: 2')),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            
+            SizedBox(height: 32),
+            
+            // Example 2: Expanded vs Flexible
+            Text('Expanded vs Flexible', 
+                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            SizedBox(height: 8),
+            Container(
+              height: 100,
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Container(
+                      color: Colors.orange,
+                      child: Center(child: Text('Expanded\\n(Must fill)')),
+                    ),
+                  ),
+                  SizedBox(width: 8),
+                  Flexible(
+                    child: Container(
+                      color: Colors.purple,
+                      child: Center(child: Text('Flexible\\n(Can shrink)')),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            
+            SizedBox(height: 32),
+            
+            // Example 3: Complex Layout
+            Text('Complex Layout Example', 
+                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            SizedBox(height: 8),
+            Expanded(
+              child: Container(
+                decoration: BoxDecoration(
+                  border: Border.all(color: Colors.grey),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Column(
+                  children: [
+                    Container(
+                      height: 60,
+                      color: Colors.blue[100],
+                      child: Center(child: Text('Header')),
+                    ),
+                    Expanded(
+                      child: Row(
+                        children: [
+                          Flexible(
+                            flex: 2,
+                            child: Container(
+                              color: Colors.green[100],
+                              child: Center(child: Text('Main Content\\n(Flex: 2)')),
+                            ),
+                          ),
+                          Flexible(
+                            flex: 1,
+                            child: Container(
+                              color: Colors.orange[100],
+                              child: Center(child: Text('Sidebar\\n(Flex: 1)')),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Container(
+                      height: 50,
+                      color: Colors.grey[200],
+                      child: Center(child: Text('Footer')),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}''',
+            language: 'dart',
+            explanation: 'Comprehensive demonstration of Flexible, Expanded, and complex layout patterns with visual examples.',
+            isRunnable: true,
+          ),
+          CodeExample(
+            id: 'stack-overlay',
+            title: 'Stack Overlay Example',
+            code: '''
+class StackOverlayCard extends StatelessWidget {
+  final String imageUrl;
+  final String title;
+  final String description;
+  final bool isFavorite;
+
+  const StackOverlayCard({
+    Key? key,
+    required this.imageUrl,
+    required this.title,
+    required this.description,
+    this.isFavorite = false,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      clipBehavior: Clip.antiAlias,
+      elevation: 8,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Stack(
+        children: [
+          // Background Image/Color
+          Container(
+            height: 200,
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [
+                  Colors.purple,
+                  Colors.blue,
+                  Colors.teal,
+                ],
+              ),
+            ),
+          ),
+          
+          // Overlay pattern
+          Container(
+            height: 200,
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [
+                  Colors.transparent,
+                  Colors.black.withOpacity(0.7),
+                ],
+              ),
+            ),
+          ),
+          
+          // Top-right favorite icon
+          Positioned(
+            top: 12,
+            right: 12,
+            child: Container(
+              padding: EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.9),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                isFavorite ? Icons.favorite : Icons.favorite_border,
+                color: isFavorite ? Colors.red : Colors.grey[600],
+                size: 20,
+              ),
+            ),
+          ),
+          
+          // Bottom content
+          Positioned(
+            left: 16,
+            right: 16,
+            bottom: 16,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                SizedBox(height: 4),
+                Text(
+                  description,
+                  style: TextStyle(
+                    color: Colors.white.withOpacity(0.9),
+                    fontSize: 14,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          
+          // Play button overlay
+          Positioned.fill(
+            child: Center(
+              child: Container(
+                width: 60,
+                height: 60,
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(0.9),
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(
+                  Icons.play_arrow,
+                  color: Colors.blue,
+                  size: 36,
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// Usage example:
+StackOverlayCard(
+  imageUrl: 'https://example.com/image.jpg',
+  title: 'Flutter Layouts',
+  description: 'Master the art of Flutter layouts',
+  isFavorite: true,
+)''',
+            language: 'dart',
+            explanation: 'Advanced Stack example showing how to create layered UIs with positioned elements, gradients, and overlays.',
+            isRunnable: true,
+          ),
+        ],
+        prerequisites: ['introduction', 'widgets-fundamentals'],
+        learningObjectives: [
+          'Understand Flutter layout system and constraint propagation',
+          'Master essential layout widgets (Container, Row, Column, Stack)',
+          'Learn flexible layouts with Expanded and Flexible widgets',
+          'Build responsive designs using MediaQuery and LayoutBuilder',
+          'Apply common layout patterns and best practices',
+          'Debug layout issues effectively using Flutter tools',
+        ],
+      ),
+
       // More chapters will be added in subsequent tasks...
     ];
   }
