@@ -31,15 +31,27 @@ class AppRoutes {
 
 /// Router configuration provider
 final routerProvider = Provider<GoRouter>((ref) {
-  final authState = ref.watch(authProvider);
-  
   final router = GoRouter(
     debugLogDiagnostics: true,
     initialLocation: AppRoutes.splash,
-    navigatorKey: NavigationService.instance._router?.routerDelegate.navigatorKey,
+    navigatorKey: GlobalKey<NavigatorState>(),
     redirect: (context, state) {
-      // Use RouteGuard for centralized redirect logic
-      return RouteGuard.getRedirectRoute(state.matchedLocation, ref);
+      // Direct redirect logic without RouteGuard for now
+      final authState = ref.read(authProvider);
+      
+      if (authState.isLoading) {
+        return null;
+      }
+      
+      if (!authState.isAuthenticated && RouteGuard.requiresAuth(state.matchedLocation)) {
+        return AppRoutes.login;
+      }
+      
+      if (authState.isAuthenticated && state.matchedLocation == AppRoutes.login) {
+        return AppRoutes.home;
+      }
+      
+      return null;
     },
     routes: [
       // Splash Screen

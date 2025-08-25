@@ -5,7 +5,7 @@ import '../repositories/learning_content_repository.dart';
 
 /// Provider for learning content repository
 final learningContentRepositoryProvider = Provider<LearningContentRepository>((ref) {
-  return LearningContentRepository.instance;
+  return LearningContentRepository();
 });
 
 /// Provider for all learning sections
@@ -29,7 +29,7 @@ final sectionChaptersProvider = Provider.family<List<LearningChapter>, String>((
 /// Provider for a specific chapter
 final chapterProvider = Provider.family<LearningChapter?, ({String sectionId, String chapterId})>((ref, params) {
   final repository = ref.watch(learningContentRepositoryProvider);
-  return repository.getChapter(params.sectionId, params.chapterId);
+  return repository.getChapterById(params.sectionId, params.chapterId);
 });
 
 /// Provider for section summary

@@ -5,7 +5,6 @@ import 'package:flutter_highlight/flutter_highlight.dart';
 import 'package:flutter_highlight/themes/github.dart';
 import '../../../core/constants/app_constants.dart';
 import '../../../core/utils/extensions.dart';
-import '../../../core/utils/helpers.dart';
 import '../providers/learning_content_provider.dart';
 import '../../../shared/models/learning_chapter.dart';
 import '../../../shared/models/learning_section.dart';
@@ -69,7 +68,7 @@ class _ChapterScreenState extends ConsumerState<ChapterScreen>
   }
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     final chapter = ref.watch(chapterProvider((
       sectionId: widget.sectionId,
       chapterId: widget.chapterId,
@@ -210,7 +209,7 @@ class _ChapterScreenState extends ConsumerState<ChapterScreen>
               value: 'report',
               child: Row(
                 children: [
-                  Icon(Icons.report_outline),
+                  Icon(Icons.report_outlined),
                   SizedBox(width: 8),
                   Text('Report Issue'),
                 ],

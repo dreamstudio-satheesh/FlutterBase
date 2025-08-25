@@ -1,17 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/constants/app_constants.dart';
 import '../../../core/utils/extensions.dart';
 import '../../../core/services/router_service.dart';
+import '../providers/auth_provider.dart';
 
-class SplashScreen extends StatefulWidget {
+class SplashScreen extends ConsumerStatefulWidget {
   const SplashScreen({super.key});
 
   @override
-  State<SplashScreen> createState() => _SplashScreenState();
+  ConsumerState<SplashScreen> createState() => _SplashScreenState();
 }
 
-class _SplashScreenState extends State<SplashScreen> 
+class _SplashScreenState extends ConsumerState<SplashScreen> 
     with SingleTickerProviderStateMixin {
   late AnimationController _animationController;
   late Animation<double> _fadeAnimation;
@@ -21,7 +23,7 @@ class _SplashScreenState extends State<SplashScreen>
   void initState() {
     super.initState();
     _setupAnimations();
-    _navigateToLogin();
+    _navigateToNextScreen();
   }
 
   void _setupAnimations() {
@@ -49,10 +51,15 @@ class _SplashScreenState extends State<SplashScreen>
     _animationController.forward();
   }
 
-  void _navigateToLogin() {
+  void _navigateToNextScreen() {
     Future.delayed(const Duration(seconds: 2), () {
       if (mounted) {
-        context.go(AppRoutes.login);
+        final authState = ref.read(authProvider);
+        if (authState.isAuthenticated) {
+          context.go(AppRoutes.home);
+        } else {
+          context.go(AppRoutes.login);
+        }
       }
     });
   }

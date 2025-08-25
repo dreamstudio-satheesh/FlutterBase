@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../constants/app_constants.dart';
 import '../../features/auth/providers/auth_provider.dart';
 import 'router_service.dart';
 
@@ -115,11 +114,13 @@ class RouteGuard {
       return AppRoutes.login;
     }
     
-    // If authenticated and on auth pages, redirect to home
-    if (authState.isAuthenticated && 
-        (currentRoute == AppRoutes.login || currentRoute == AppRoutes.splash)) {
+    // If authenticated and on login page, redirect to home
+    if (authState.isAuthenticated && currentRoute == AppRoutes.login) {
       return AppRoutes.home;
     }
+    
+    // Allow splash screen to show for everyone (authenticated or not)
+    // Splash screen itself will handle navigation after its timer
     
     // Check learning content access
     if (currentRoute.startsWith('/sections/') && 

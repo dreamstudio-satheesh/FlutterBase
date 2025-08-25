@@ -135,7 +135,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           prefixIcon: Icons.person_outline,
           validator: AppValidators.validateUsername,
           textInputAction: TextInputAction.next,
-          enabled: !isLoading,
+          enabled: !ref.watch(authProvider).isLoading,
         ),
         const SizedBox(height: AppConstants.marginMedium),
         CustomTextField(
@@ -153,7 +153,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           validator: AppValidators.validatePassword,
           textInputAction: TextInputAction.done,
           onSubmitted: (_) => _handleLogin(),
-          enabled: !isLoading,
+          enabled: !ref.watch(authProvider).isLoading,
         ),
       ],
     );

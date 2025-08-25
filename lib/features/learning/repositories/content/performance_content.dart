@@ -1,5 +1,4 @@
 import '../../../../shared/models/learning_chapter.dart';
-import '../../../../shared/models/code_example.dart';
 
 /// Performance Optimization section content
 class PerformanceContent {

@@ -1,3 +1,4 @@
+import 'dart:math' show pow;
 import 'package:flutter/material.dart';
 
 /// Extension methods for String class
@@ -271,5 +272,3 @@ extension DoubleExtensions on double {
   }
 }
 
-/// Import required for pow function
-import 'dart:math' show pow;
